@@ -42,3 +42,22 @@ with doanh_thu_thang as(
 	sum(doanh_thu) over (partition by nam order by thang) as luy_ke
 	from doanh_thu_thang 
 	order by thang asc;
+
+-- Bài 3.3: Tính tổng lượng khách và số lượng khách quay lại + tỉ lệ
+
+with so_luong_khach as (
+	select 
+	c.customer_unique_id,		
+	count(*) as so_don
+	from orders o 
+	join customers c 
+	on o.customer_id  = c.customer_id 
+	where o.order_status = 'delivered'
+	group by c.customer_unique_id
+)
+	select
+	count(so_don) as tong_khach,
+	count(so_don ) filter (where so_don  >=2) as khach_quay_lai,
+	round(100.0*count(so_don ) filter (where so_don  >1)/count(so_don), 2) as ti_le_quay_lai_pct
+	from so_luong_khach  
+	order by tong_khach desc;

@@ -69,3 +69,27 @@ from orders
 where customer_id = '8ab97904e6daea8866dbdbc4fb7aad2c';
 
 CREATE INDEX tim_khach_hang ON orders (customer_id) ;
+
+-- bài 3.3b tìm số lần khách hàng mua lại và trung bình thời gian mua lại
+
+	with don_hang as (
+	select 
+	c.customer_unique_id,		
+	o.order_purchase_timestamp::date as ngay_dat_don
+	from orders o 
+	join customers c 
+	on o.customer_id  = c.customer_id 
+	where o.order_status = 'delivered'
+), 
+	don_truoc as (
+	select 
+	customer_unique_id,
+	ngay_dat_don,
+	lag(ngay_dat_don) over (partition by customer_unique_id order by ngay_dat_don) as ngay_truoc
+	from don_hang  
+)
+	select 
+	count(*) as so_lan_quay_lai,
+	round(AVG(ngay_dat_don - ngay_truoc), 1) as trung_binh_thoi_gian
+	from don_truoc
+	where ngay_truoc is not null;

@@ -61,3 +61,11 @@ with so_luong_khach as (
 	round(100.0*count(so_don ) filter (where so_don  >1)/count(so_don), 2) as ti_le_quay_lai_pct
 	from so_luong_khach  
 	order by tong_khach desc;
+
+EXPLAIN analyze
+select 
+*
+from orders
+where customer_id = '8ab97904e6daea8866dbdbc4fb7aad2c';
+
+CREATE INDEX tim_khach_hang ON orders (customer_id) ;
